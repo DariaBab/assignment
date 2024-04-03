@@ -105,10 +105,63 @@ function countContactsByCountry(contactsArr, country) {
 // 4. Write a function that returns a new array of contacts that are within a given age range, e.g., 25 to 35 years old.
 
 function GetContactsByAge(contactsArr, minAge, maxAge) {
-  return contactsArr.filter(contact => {
+  return contactsArr.filter((contact) => {
     const contactAge = contact.dob.age;
     return contactAge >= minAge && contactAge <= maxAge;
   });
 }
 
-console.log(GetContactsByAge(contacts.results, 25, 35));
+//console.log(GetContactsByAge(contacts.results, 25, 35));
+
+//Small App Assignment: Contact Search Tool
+
+const searchForm = document.getElementById('searchForm');
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+
+searchForm.addEventListener('submit', handleFormSubmit);
+
+function handleFormSubmit(event) {
+  event.preventDefault();
+
+  const searchValue = searchInput.value.trim();
+  let filteredContacts;
+  if (searchValue) {
+    filteredContacts = isNaN(searchValue)
+    ? GetContactsByName(contactsResults, searchValue)
+    : GetContactsByPhoneNumber(contactsResults, searchValue);
+
+  } else {
+    filteredContacts = [];
+  }
+  
+  displayResults(filteredContacts);
+}
+
+function GetContactsByName(contactsArr, name) {
+  const fullNameIncludesName = (contact) => {
+    const fullName = `${contact.name.first} ${contact.name.last}`;
+    return fullName.toLowerCase().includes(name.toLowerCase());
+  };
+  return contactsArr.filter(fullNameIncludesName);
+}
+
+function GetContactsByPhoneNumber(contactsArr, phoneNumber) {
+  return contactsArr.filter((contact) => contact.phone.includes(phoneNumber));
+}
+
+function displayResults(contactsToShow) {
+  searchResults.innerHTML = '';
+
+  if (contactsToShow.length === 0) {
+    searchResults.textContent = 'No matching contacts found.';
+  } else {
+    const ul = document.createElement('ul');
+    contactsToShow.forEach((contact) => {
+      const li = document.createElement('li');
+      li.textContent = `${contact.name.first} ${contact.name.last} - ${contact.phone}`;
+      ul.appendChild(li);
+    });
+    searchResults.appendChild(ul);
+  }
+}
